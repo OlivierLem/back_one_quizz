@@ -5,7 +5,7 @@ const router = require('express').Router();
 
 router.post('/', async (req, res ) => {
     const { pseudo, email, password } = req.body;
-
+    console.log(req);
     const newUser = new UserModel({
         pseudo,
         email,
