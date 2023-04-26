@@ -1,0 +1,16 @@
+{
+    "version": 2,
+    "name": "back_one_quizz",
+    "builds": [
+        {
+            "src": "/server.js",
+            "use": "@vercel/node"
+        }
+    ],
+    "routes": [
+        {
+            "src": "/(.*)",
+            "dest": "/"
+        }
+    ]
+}
