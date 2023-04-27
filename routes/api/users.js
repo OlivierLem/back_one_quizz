@@ -4,25 +4,24 @@ const bcrypt =  require('bcrypt');
 const router = require('express').Router();
 
 router.post('/', async (req, res ) => {
-    const { pseudo, email, password } = req.body;
-    console.log(req);
+    const { pseudo_inscription, email, password_inscription } = req.body;
     const newUser = new UserModel({
-        pseudo,
+        pseudo: pseudo_inscription,
         email,
-        password: await bcrypt.hash(password, 8),
+        password: await bcrypt.hash(password_inscription, 8),
         image: null,
         status: null,
         role: 'normal'
     });
     try {
         const user = await newUser.save();
-        console.log({user});
         res.send(user);
 
     } catch (error) {
         console.error(error);
         if (error.code === 11000) {
-            res.status(400).json('Email déjà utilisé');
+            let keyPattern = Object.keys(error.keyPattern)[0]
+            res.status(400).json(`${keyPattern} déjà utilisé`);
         } else {
             res.status(400).json("Oops il y'a une erreur");
         }

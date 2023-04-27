@@ -12,7 +12,7 @@ const userShema = mongoose.Schema({
     password: String,
     image: String,
     status: String,
-    role: String
+    role: String,
 })
 
 const UserModel = mongoose.model('user', userShema);
