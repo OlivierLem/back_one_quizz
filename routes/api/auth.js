@@ -6,6 +6,7 @@ const router = require('express').Router();
 
 router.post('/', async (req, res) => {
     const { pseudo, password, stayConnected} = req.body;
+    console.log('connexion');
     try {
         const user = await UserModel.findOne({ pseudo }).exec();
         if (user) {
@@ -35,6 +36,7 @@ router.post('/', async (req, res) => {
 router.get('/current', async(req, res) => {
     const { token } = req.cookies;
     if (token) {
+        console.log('token user trouvé');
         try {
             const decodedToken = jsonwebtoken.verify(token, keyPub, {
                 algorithms: "RS256",
@@ -53,11 +55,13 @@ router.get('/current', async(req, res) => {
             res.json(null)
         }
     } else {
+        //console.log("il n'ya pas de token user");
         res.json(null)
     }
 })
 
 router.delete('/', (req, res) => {
+    console.log('delete cookie')
     res.clearCookie('token');
     res.end();
 })

@@ -13,6 +13,7 @@ router.post('/', async (req, res ) => {
         status: null,
         role: 'normal'
     });
+    console.log('inscription');
     try {
         const user = await newUser.save();
         res.send(user);
