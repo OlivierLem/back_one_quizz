@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const userShema = mongoose.Schema({
+const userSchema = mongoose.Schema({
     pseudo: {
         type: String,
         unique: true,
@@ -15,6 +15,6 @@ const userShema = mongoose.Schema({
     role: String,
 })
 
-const UserModel = mongoose.model('user', userShema);
+const UserModel = mongoose.model('user', userSchema);
 
 module.exports = UserModel;

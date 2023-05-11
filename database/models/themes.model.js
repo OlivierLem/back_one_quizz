@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-const themeShema = mongoose.Schema({
+const themeSchema = mongoose.Schema({
     name: {
         type: String,
         unique: true
@@ -13,6 +13,6 @@ const themeShema = mongoose.Schema({
     category: String,
 })
 
-const ThemeModel = mongoose.model('theme', themeShema);
+const ThemeModel = mongoose.model('theme', themeSchema);
 
 module.exports = ThemeModel;
