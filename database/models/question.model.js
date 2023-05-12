@@ -6,7 +6,10 @@ const questionSchema = mongoose.Schema({
         isValid: Boolean,
         name: String
     }],
-    theme: String,
+    theme: { 
+        type: mongoose.ObjectId, 
+        ref: 'theme' 
+    },
     questionType: String,
     times: Number,
     status: String,

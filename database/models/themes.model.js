@@ -3,7 +3,7 @@ const mongoose = require("mongoose");
 const themeSchema = mongoose.Schema({
     name: {
         type: String,
-        unique: true
+        unique: true,
     },
     image: {
         type: String,

@@ -2,7 +2,7 @@ const ThemeModel = require('../../database/models/themes.model');
 const router = require('express').Router();
 
 router.get('/', async (req, res) => {
-    console.log('detection');
+    console.log('théme trouver');
     try {
         console.log('try');
         const themes = await ThemeModel.find()
