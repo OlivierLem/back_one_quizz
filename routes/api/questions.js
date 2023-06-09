@@ -8,13 +8,14 @@ const router = require('express').Router();
 router.post('/create', async (req, res) => {
     const { question: intitule, responses, times, type, theme, status } = req.body;
     const { token } = req.cookies;
+    console.log(req.body);
     if (token) {
         console.log('token user trouvé');
         try {
             const decodedToken = jsonwebtoken.verify(token, keyPub, {
                 algorithms: "RS256",
             });
-            console.log(theme)
+            //console.log(theme)
             const themeBack = await ThemeModel.findOne({name: theme},).select('-image').exec()
             if(themeBack) {
                 console.log('theme trouvé')
@@ -27,7 +28,8 @@ router.post('/create', async (req, res) => {
                     status,
                     user: decodedToken.sub
                 }) 
-                console.log(newQuestion);
+                
+                //console.log(newQuestion);
                 const question = await newQuestion.save();
                 res.send(question)
             }
@@ -43,7 +45,8 @@ router.post('/create', async (req, res) => {
 
 router.get('/', async (req, res) => {
     const { token } = req.cookies;
-    if (token) {
+    const { role } = req.query;
+    if (token && role === undefined) {
         console.log('token utilisateur trouvé')
         try {
             const decodedToken = jsonwebtoken.verify(token, keyPub, {
@@ -56,7 +59,6 @@ router.get('/', async (req, res) => {
             
             //* Afficher les questions public
             // const questions = await QuestionModel.find({status: 'public'}).populate('user').exec()
-            
             if(questions) {
                 let user
                 for (const question of questions) {
@@ -71,6 +73,87 @@ router.get('/', async (req, res) => {
             console.error(error);
             res.json(null)
         }
+    } else if (token && role === 'admin') {
+        try {
+            //! Voir comment utiliser jointure avec populate et exec
+            //console.log('admin');
+            const questions = await QuestionModel.find().exec()
+            if(questions) {
+                let user
+                let theme
+                for (const question of questions) {
+                    user = await UserModel.findById(question.user).select('-email -role -status -password -__v').exec()
+                    question.user = user;
+                    theme = await ThemeModel.findOne({_id: question.theme}).exec();
+                    question.theme = theme
+                }
+                                
+                res.json(questions)
+            } else {
+                res.json(null)
+            }
+        } catch (error) {
+            console.error(error);
+            res.json(null)
+        }
+    }
+})
+
+router.delete('/', async (req, res) => {
+    const {_id} = req.body;
+    console.log('test delete');
+    try {
+        const questionDelete = await QuestionModel.findOneAndDelete({_id})
+        console.log('question supprimer')
+        res.json('question supprimer')
+        
+    } catch (error) {
+        console.error(error)
+        res.json(null)
+    }
+
+    /* connection.query(sqlDeleteImages, (err, result) => {
+        if (err) throw err;
+        const sqlDeleteLink = `DELETE FROM periode_evenement WHERE idEvenement = '${id}'`
+        
+        connection.query(sqlDeleteLink, (err, result) => {
+            const sqlDeleteEvent = `DELETE FROM evenements WHERE idEvenement = '${id}'`
+
+            connection.query(sqlDeleteEvent, (err, result) => {
+                if (err) throw err;
+
+                console.log('événements supprimer')
+                res.json('événements supprimer')
+            })
+        })
+    }) */
+})
+
+router.post('/editQuestion', async (req, res) => {
+    const { theme } =req.body
+    console.log(req.body);
+    // * Modifier theme
+    try {
+        
+        const themeBack = await ThemeModel.findOne({name: theme},).select('-image').exec()
+
+        if(themeBack) {
+            console.log('theme trouvé')
+
+            const question = {
+                _id:req.body.id,
+                theme: themeBack,
+                ...req.body,
+                id: undefined,
+            }
+            console.log(question)
+            //const questionUpdate = await QuestionModel.findByIdAndUpdate(_id, req.body)
+            
+            //console.log(newQuestion);
+            //res.send(question)
+        }
+    } catch (error) {
+        console.error(error)
     }
 })
 

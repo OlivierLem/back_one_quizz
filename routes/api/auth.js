@@ -6,25 +6,49 @@ const router = require('express').Router();
 
 router.post('/', async (req, res) => {
     const { pseudo, password, stayConnected} = req.body;
-    console.log('connexion');
+    const { role } = req.query;
+    console.log(role);
     try {
-        const user = await UserModel.findOne({ pseudo }).exec();
-        if (user) {
-            if (bcrypt.compareSync(password, user.password)) {
-                if (stayConnected) {
-                    const token = jsonwebtoken.sign({}, key, {
-                        subject: user._id.toString(),
-                        expiresIn: 3600 * 24 * 30 * 6,
-                        algorithm: "RS256"
-                    })
-                    res.cookie('token', token);
+        if(role === 'admin') {
+            console.log('dans admin');
+
+            const user = await UserModel.findOne({ pseudo, role}).exec();
+            if(user) {
+                if (bcrypt.compareSync(password, user.password)) {
+                    if (stayConnected) {
+                        const token = jsonwebtoken.sign({}, key, {
+                            subject: user._id.toString(),
+                            expiresIn: 3600 * 24 * 30 * 6,
+                            algorithm: "RS256"
+                        })
+                        res.cookie('token', token);
+                    }
+                    res.json(user)
+                } else {
+                    res.status(400).json('Pseudo et/ou mots de passe incorrect')
                 }
-                res.json(user)
-            } else {
-                res.status(400).json('Pseudo et/ou mots de passe incorrect')
             }
-        } else {
-            res.status(400).json('Pseudo et/ou mots de passe incorrect')
+            else {
+                res.status(400).json("Vous n'êtes pas un admin")
+            }
+        } else if(role === undefined) {
+            //console.log('hors admin');
+            const user = await UserModel.findOne({ pseudo }).exec();
+            if (user ) {
+                if (bcrypt.compareSync(password, user.password)) {
+                    if (stayConnected) {
+                        const token = jsonwebtoken.sign({}, key, {
+                            subject: user._id.toString(),
+                            expiresIn: 3600 * 24 * 30 * 6,
+                            algorithm: "RS256"
+                        })
+                        res.cookie('token', token);
+                    }
+                    res.json(user)
+                } else {
+                    res.status(400).json('Pseudo et/ou mots de passe incorrect')
+                }
+            }
         }
         
     } catch (error) {
